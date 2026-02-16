@@ -20,7 +20,6 @@
             height: 100vh;
         }
 
-        /* Sfondo dinamico con bagliore reattivo */
         #bg-glow {
             position: absolute;
             width: 100%;
@@ -29,7 +28,6 @@
             z-index: 1;
         }
 
-        /* Container principale */
         .content-container {
             position: relative;
             z-index: 10;
@@ -41,7 +39,6 @@
             padding: 2rem;
         }
 
-        /* Sfera reattiva (Beat Reactive) */
         #audio-sphere {
             width: 120px;
             height: 120px;
@@ -96,7 +93,6 @@
             margin-top: 1rem;
         }
 
-        /* Volume slider personalizzato */
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
@@ -125,7 +121,6 @@
     <div id="bg-glow"></div>
 
     <div class="content-container">
-        <!-- Schermata di Benvenuto -->
         <div id="welcome" class="welcome-screen">
             <h1 class="text-4xl font-black mb-8 tracking-tighter italic text-red-600">RADIO CARDUCCI</h1>
             <div class="space-y-4 px-4">
@@ -139,12 +134,9 @@
             <div onclick="startRadio()" class="btn-start">CI STO</div>
         </div>
 
-        <!-- Player Principale -->
         <div id="player" class="hidden w-full flex flex-col items-center">
-            <!-- Sfera Reattiva -->
             <div id="audio-sphere"></div>
             
-            <!-- Info Brano -->
             <div class="player-info">
                 <h2 id="track-title" class="text-2xl font-black tracking-tight mb-2 truncate px-4">In ascolto...</h2>
                 <div class="flex items-center justify-center gap-3">
@@ -153,7 +145,6 @@
                 </div>
             </div>
             
-            <!-- Controlli -->
             <div class="w-full mt-12 space-y-10 flex flex-col items-center">
                 <div class="w-full flex items-center gap-4 px-6 opacity-60 hover:opacity-100 transition-opacity">
                     <i class="fas fa-volume-down text-xs"></i>
@@ -168,7 +159,6 @@
         </div>
     </div>
 
-    <!-- Elemento Audio -->
     <audio id="audio-stream" crossorigin="anonymous"></audio>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
@@ -200,7 +190,6 @@
             setInterval(updateMetadata, 15000);
         }
 
-        // Funzione per gestire la sfera reattiva ai bassi
         function setupVisualizer() {
             try {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -219,24 +208,21 @@
                     
                     analyser.getByteFrequencyData(dataArray);
                     
-                    // Calcolo media frequenze basse
                     let sum = 0;
                     for(let i = 0; i < 10; i++) sum += dataArray[i];
                     let average = sum / 10;
                     
-                    // Applica trasformazioni
                     let scale = 1 + (average / 350); 
                     let glowIntensity = average / 255;
                     
                     sphere.style.transform = `scale(${scale})`;
                     sphere.style.boxShadow = `0 0 ${average/2}px rgba(244, 9, 25, 0.5)`;
                     
-                    // Effetto bagliore sullo sfondo
                     bgGlow.style.background = `radial-gradient(circle at center, rgba(244, 9, 25, ${0.05 + (glowIntensity * 0.08)}) 0%, rgba(0,0,0,1) 80%)`;
                 }
                 animate();
             } catch (e) {
-                console.log("Web Audio API non supportata su questo browser");
+                console.error(e);
             }
         }
 
