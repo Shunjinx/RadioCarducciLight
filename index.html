@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Carducci Light</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: white;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        /* Sfondo dinamico con bagliore reattivo */
+        #bg-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(244, 9, 25, 0.05) 0%, rgba(0,0,0,1) 70%);
+            z-index: 1;
+        }
+
+        /* Container principale */
+        .content-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        /* Sfera reattiva (Beat Reactive) */
+        #audio-sphere {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle at 30% 30%, #ff2d3a, #910008);
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(244, 9, 25, 0.3);
+            transition: transform 0.08s ease-out;
+            margin-bottom: 5rem; 
+            display: none;
+        }
+
+        .welcome-screen {
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-start {
+            background-color: white;
+            color: black;
+            padding: 1.2rem 3.5rem;
+            border-radius: 99px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            margin-top: 3rem;
+            display: inline-block;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .btn-start:hover {
+            transform: scale(1.08);
+            background-color: #f40919;
+            color: white;
+        }
+
+        .light-text {
+            line-height: 1.8;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.95rem;
+        }
+
+        .player-info {
+            width: 100%;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        /* Volume slider personalizzato */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #f40919;
+            margin-top: -6px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(244, 9, 25, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg-glow"></div>
+
+    <div class="content-container">
+        <!-- Schermata di Benvenuto -->
+        <div id="welcome" class="welcome-screen">
+            <h1 class="text-4xl font-black mb-8 tracking-tighter italic text-red-600">RADIO CARDUCCI</h1>
+            <div class="space-y-4 px-4">
+                <p class="light-text">
+                    Non ti lasciamo mai solo. Sappiamo che alcuni dispositivi hanno difficoltà ad accedere al sito completo e che a volte le cose non vanno come vorremmo.
+                </p>
+                <p class="light-text">
+                    Proprio per questo abbiamo creato la <strong>versione leggera</strong>: solo la diretta, prova Radio Carducci in versione light.
+                </p>
+            </div>
+            <div onclick="startRadio()" class="btn-start">CI STO</div>
+        </div>
+
+        <!-- Player Principale -->
+        <div id="player" class="hidden w-full flex flex-col items-center">
+            <!-- Sfera Reattiva -->
+            <div id="audio-sphere"></div>
+            
+            <!-- Info Brano -->
+            <div class="player-info">
+                <h2 id="track-title" class="text-2xl font-black tracking-tight mb-2 truncate px-4">In ascolto...</h2>
+                <div class="flex items-center justify-center gap-3">
+                    <span class="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"></span>
+                    <p class="text-white/40 font-bold text-[10px] tracking-[0.4em] uppercase">Versione Light</p>
+                </div>
+            </div>
+            
+            <!-- Controlli -->
+            <div class="w-full mt-12 space-y-10 flex flex-col items-center">
+                <div class="w-full flex items-center gap-4 px-6 opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fas fa-volume-down text-xs"></i>
+                    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.8">
+                    <i class="fas fa-volume-up text-xs"></i>
+                </div>
+                
+                <button onclick="toggleAudio()" class="w-16 h-16 flex items-center justify-center rounded-full border border-white/10 hover:bg-white/5 transition-all">
+                    <i id="play-icon" class="fas fa-pause text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elemento Audio -->
+    <audio id="audio-stream" crossorigin="anonymous"></audio>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script>
+        const STREAM_URL = "https://radiocarducci.radioca.st/stream.mp3";
+        const METADATA_URL = "https://cors.unmutedte.ch/https://api.streamerr.co/v1/nowplaying/1039";
+        
+        const audio = document.getElementById('audio-stream');
+        const welcome = document.getElementById('welcome');
+        const player = document.getElementById('player');
+        const sphere = document.getElementById('audio-sphere');
+        const trackTitle = document.getElementById('track-title');
+        const playIcon = document.getElementById('play-icon');
+        const volumeSlider = document.getElementById('volume');
+        const bgGlow = document.getElementById('bg-glow');
+
+        let audioCtx, analyser, dataArray, source;
+
+        function startRadio() {
+            welcome.style.display = 'none';
+            player.classList.remove('hidden');
+            sphere.style.display = 'block';
+            
+            audio.src = STREAM_URL;
+            audio.play();
+            
+            setupVisualizer();
+            updateMetadata();
+            setInterval(updateMetadata, 15000);
+        }
+
+        // Funzione per gestire la sfera reattiva ai bassi
+        function setupVisualizer() {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                source = audioCtx.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                
+                analyser.fftSize = 64;
+                const bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    if (audio.paused) return;
+                    
+                    analyser.getByteFrequencyData(dataArray);
+                    
+                    // Calcolo media frequenze basse
+                    let sum = 0;
+                    for(let i = 0; i < 10; i++) sum += dataArray[i];
+                    let average = sum / 10;
+                    
+                    // Applica trasformazioni
+                    let scale = 1 + (average / 350); 
+                    let glowIntensity = average / 255;
+                    
+                    sphere.style.transform = `scale(${scale})`;
+                    sphere.style.boxShadow = `0 0 ${average/2}px rgba(244, 9, 25, 0.5)`;
+                    
+                    // Effetto bagliore sullo sfondo
+                    bgGlow.style.background = `radial-gradient(circle at center, rgba(244, 9, 25, ${0.05 + (glowIntensity * 0.08)}) 0%, rgba(0,0,0,1) 80%)`;
+                }
+                animate();
+            } catch (e) {
+                console.log("Web Audio API non supportata su questo browser");
+            }
+        }
+
+        function toggleAudio() {
+            if (audio.paused) {
+                audio.play();
+                playIcon.className = 'fas fa-pause text-xl';
+            } else {
+                audio.pause();
+                playIcon.className = 'fas fa-play text-xl ml-1';
+                sphere.style.transform = `scale(1)`;
+            }
+        }
+
+        volumeSlider.addEventListener('input', (e) => {
+            audio.volume = e.target.value;
+        });
+
+        async function updateMetadata() {
+            try {
+                const response = await fetch(METADATA_URL);
+                const data = await response.json();
+                const song = data.now_playing?.song;
+                if (song && song.title) {
+                    trackTitle.innerText = song.title;
+                }
+            } catch (err) {
+                trackTitle.innerText = "Radio Carducci Live";
+            }
+        }
+    </script>
+</body>
+</html>
